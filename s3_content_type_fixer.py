@@ -70,7 +70,7 @@ def main():
 
     # Start the workers
     for _ in xrange(args.workers):
-        p = multiprocessing.Process(target=check_headers, args=(bucket, queue, args.verbose),)
+        p = multiprocessing.Process(target=check_headers, args=(bucket, queue, args.verbose))
         p.start()
         processes.append(p)
     
