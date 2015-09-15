@@ -18,7 +18,7 @@ def get_bucket(access_key, secret_key, bucket):
     """Gets an S3 bucket"""
     return S3Connection(access_key, secret_key).get_bucket(bucket)
 
-def check_headers(bucket, queue, verbose):
+def check_headers(bucket, queue, verbose, dryrun):
     """
     Callback used by sub-processes to check the headers of candidate files in
     a multiprocessing queue
@@ -72,7 +72,7 @@ def main():
 
     # Start the workers
     for _ in xrange(args.workers):
-        p = multiprocessing.Process(target=check_headers, args=(bucket, queue, args.verbose))
+        p = multiprocessing.Process(target=check_headers, args=(bucket, queue, args.verbose, args.dryrun))
         p.start()
         processes.append(p)
     
