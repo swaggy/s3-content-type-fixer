@@ -63,7 +63,7 @@ def main():
     parser.add_argument("--prefixes", "-p", type=str, default=[""], required=False, nargs="*", help="File path prefixes to check")
     parser.add_argument("--workers", "-w", type=int, default=4, required=False, help="The number of workers")
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
-    parser.add_argument("--dryrun", "-d", action="store_false", default=False, required=False,help="Add this for a dry run (don't change any file)")
+    parser.add_argument("--dryrun", "-d", action="store_true", default=False, required=False,help="Add this for a dry run (don't change any file)")
 
     args = parser.parse_args()
     queue = multiprocessing.Queue()
