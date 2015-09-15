@@ -61,6 +61,7 @@ def main():
     parser.add_argument("--secret-key", "-s", type=str, required=True, help="The AWS secret key")
     parser.add_argument("--bucket", "-b", type=str, required=True, help="The S3 bucket to check")
     parser.add_argument("--prefixes", "-p", type=str, default=[""], required=False, nargs="*", help="File path prefixes to check")
+    parser.add_argument("--suffix", "-p", type=str, default=[""], required=False, help="File path suffix (Only One) to check")
     parser.add_argument("--workers", "-w", type=int, default=4, required=False, help="The number of workers")
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
     parser.add_argument("--dryrun", "-d", action="store_true", default=False, required=False,help="Add this for a dry run (don't change any file)")
@@ -78,7 +79,10 @@ def main():
     
     # Add the items to the queue
     for key in find_matching_files(bucket, args.prefixes):
-        queue.put(key.name)
+        if args.suffix:
+            if key.name.endswith(args.suffix):
+        else:
+            queue.put(key.name)
 
     # Add None's to the end of the queue, which acts as a signal for the
     # proceses to finish
