@@ -51,7 +51,8 @@ def check_headers(bucket, queue, verbose):
                 print "%s: Matches expected content type" % key.name
         else:
             print "%s: Current content type (%s) does not match expected (%s); fixing" % (key.name, content_type, expected_content_type)
-            key.copy(key.bucket, key.name, preserve_acl=True, metadata={'Content-Type': expected_content_type, 'Content-Disposition': key.content_disposition})
+            if not dryrun:
+                key.copy(key.bucket, key.name, preserve_acl=True, metadata={'Content-Type': expected_content_type, 'Content-Disposition': key.content_disposition})
 
 def main():
     parser = argparse.ArgumentParser(description="Fixes the content-type of assets on S3")
@@ -62,6 +63,7 @@ def main():
     parser.add_argument("--prefixes", "-p", type=str, default=[""], required=False, nargs="*", help="File path prefixes to check")
     parser.add_argument("--workers", "-w", type=int, default=4, required=False, help="The number of workers")
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
+    parser.add_argument("--dryrun", "-d", type=bool, default=False,required=False,help="Add this for a dry run (don't change any file)")
 
     args = parser.parse_args()
     queue = multiprocessing.Queue()
