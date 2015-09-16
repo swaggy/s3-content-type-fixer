@@ -18,7 +18,7 @@ def get_bucket(access_key, secret_key, bucket):
     """Gets an S3 bucket"""
     return S3Connection(access_key, secret_key).get_bucket(bucket)
 
-def check_headers(bucket, queue, verbose):
+def check_headers(bucket, queue, verbose, dryrun):
     """
     Callback used by sub-processes to check the headers of candidate files in
     a multiprocessing queue
@@ -51,7 +51,8 @@ def check_headers(bucket, queue, verbose):
                 print "%s: Matches expected content type" % key.name
         else:
             print "%s: Current content type (%s) does not match expected (%s); fixing" % (key.name, content_type, expected_content_type)
-            key.copy(key.bucket, key.name, preserve_acl=True, metadata={'Content-Type': expected_content_type, 'Content-Disposition': key.content_disposition})
+            if not dryrun:
+                key.copy(key.bucket, key.name, preserve_acl=True, metadata={'Content-Type': expected_content_type, 'Content-Disposition': key.content_disposition})
 
 def main():
     parser = argparse.ArgumentParser(description="Fixes the content-type of assets on S3")
@@ -62,6 +63,7 @@ def main():
     parser.add_argument("--prefixes", "-p", type=str, default=[""], required=False, nargs="*", help="File path prefixes to check")
     parser.add_argument("--workers", "-w", type=int, default=4, required=False, help="The number of workers")
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
+    parser.add_argument("--dryrun", "-d", action="store_true", default=False, required=False,help="Add this for a dry run (don't change any file)")
 
     args = parser.parse_args()
     queue = multiprocessing.Queue()
@@ -70,7 +72,7 @@ def main():
 
     # Start the workers
     for _ in xrange(args.workers):
-        p = multiprocessing.Process(target=check_headers, args=(bucket, queue, args.verbose))
+        p = multiprocessing.Process(target=check_headers, args=(bucket, queue, args.verbose, args.dryrun))
         p.start()
         processes.append(p)
     
